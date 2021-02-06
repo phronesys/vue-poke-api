@@ -30,17 +30,35 @@ export default {
       pokeAbilities: [],
     };
   },
-  methods: {
-    saveLocal() {},
-  },
   created() {
     const axios = require("axios").default;
+    let self = this;
+    const pokeAbs = [];
+    const images = [];
     const pokemonsitos = async () => {
       try {
         const res = await axios.get(
           "https://pokeapi.co/api/v2/pokemon?limit=151"
         );
-        // console.log(res.data.results);
+        console.log(res.data.results[0].url);
+        const urls = [];
+        for (let i = 0; i < res.data.results.length; i++) {
+          urls.push(res.data.results[i].url);
+        }
+        // https://stackoverflow.com/questions/44402079/how-to-make-multiple-axios-requests-using-a-dynamic-array-of-links-in-javascript/44402712
+        axios.all(urls.map((url) => axios.get(url))).then(
+          axios.spread(function (...res) {
+            console.log(res[0].data.sprites.front_default);
+            for (let i = 0; i < res.length; i++) {
+              pokeAbs.push(res[i].data.abilities);
+              images.push(res[i].data.sprites.front_default);
+            }
+            self.pokeAbilities = [...pokeAbs];
+            self.imagesArray = [...images];
+            console.log(self.images);
+          })
+        );
+
         //this.pokemones = res.data.results;
         // Para capitalizar la primera letra
         for (let i = 0; i < res.data.results.length; i++) {
@@ -49,32 +67,6 @@ export default {
             res.data.results[i].name.substring(1);
           this.pokemones.push(pokemon);
         }
-        // cada pokemon tiene que hacer HTTP request
-        // para asi obtener su imagen y stats
-        for (const pokemon of res.data.results) {
-          // console.log(pokemon.url);
-          const pokemonImages = async () => {
-            try {
-              const res = await axios.get(pokemon.url);
-              this.imagesArray.push(res.data.sprites.front_default);
-              // console.log(res.data.abilities[0].ability.name);
-
-              const array = [];
-              for (let i = 0; i < res.data.abilities.length; i++) {
-                // console.log(res.data.abilities[i].ability.name);
-                array.push(res.data.abilities[i].ability.name);
-              }
-              // console.log(array);
-              this.pokeAbilities.push(array);
-            } catch (error) {
-              console.error(error);
-            }
-          };
-          pokemonImages();
-        }
-        const pokes = JSON.stringify(this.pokemones);
-        window.localStorage.setItem("pokemones", pokes);
-        console.log(JSON.parse(window.localStorage.getItem("pokemones")));
       } catch (error) {
         console.error(error);
       }
