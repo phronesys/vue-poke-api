@@ -12,7 +12,8 @@
         <img :src="imagesArray[index]" alt="" />
         <ul class="abilities">
           <li v-for="abilities in pokeAbilities[index]" :key="abilities">
-            {{ abilities }}
+            <!-- {{ abilities }} -->
+            <div v-for="ability in abilities" :key="ability">{{ability.name}}</div>
           </li>
         </ul>
       </li>
@@ -40,7 +41,7 @@ export default {
         const res = await axios.get(
           "https://pokeapi.co/api/v2/pokemon?limit=151"
         );
-        console.log(res.data.results[0].url);
+        // console.log(res.data.results[0].url);
         const urls = [];
         for (let i = 0; i < res.data.results.length; i++) {
           urls.push(res.data.results[i].url);
@@ -48,14 +49,15 @@ export default {
         // https://stackoverflow.com/questions/44402079/how-to-make-multiple-axios-requests-using-a-dynamic-array-of-links-in-javascript/44402712
         axios.all(urls.map((url) => axios.get(url))).then(
           axios.spread(function (...res) {
-            console.log(res[0].data.sprites.front_default);
+            // console.log(res[0].data.sprites.front_default);
             for (let i = 0; i < res.length; i++) {
               pokeAbs.push(res[i].data.abilities);
               images.push(res[i].data.sprites.front_default);
             }
             self.pokeAbilities = [...pokeAbs];
             self.imagesArray = [...images];
-            console.log(self.images);
+            // pokeAbilities -> pokemon -> ability -> ability.name
+            console.log(self.pokeAbilities[1][1].ability.name);
           })
         );
 
