@@ -11,7 +11,9 @@
         <!-- <p>{{ imagesArray[1] }}</p> -->
         <img :src="imagesArray[index]" alt="" />
         <ul class="abilities">
-          <li  v-for="abilities in pokeAbilities[index]" :key="abilities">{{abilities}}</li>
+          <li v-for="abilities in pokeAbilities[index]" :key="abilities">
+            {{ abilities }}
+          </li>
         </ul>
       </li>
     </ul>
@@ -27,6 +29,9 @@ export default {
       imagesArray: [],
       pokeAbilities: [],
     };
+  },
+  methods: {
+    saveLocal() {},
   },
   created() {
     const axios = require("axios").default;
@@ -59,7 +64,7 @@ export default {
                 // console.log(res.data.abilities[i].ability.name);
                 array.push(res.data.abilities[i].ability.name);
               }
-              console.log(array);
+              // console.log(array);
               this.pokeAbilities.push(array);
             } catch (error) {
               console.error(error);
@@ -67,6 +72,9 @@ export default {
           };
           pokemonImages();
         }
+        const pokes = JSON.stringify(this.pokemones);
+        window.localStorage.setItem("pokemones", pokes);
+        console.log(JSON.parse(window.localStorage.getItem("pokemones")));
       } catch (error) {
         console.error(error);
       }
@@ -83,6 +91,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: red;
 }
 .header {
   width: 100%;
@@ -94,7 +103,6 @@ export default {
   background-size: cover;
 }
 .container {
-  border: #2c3e50 solid 1px;
   display: flex;
   flex-wrap: wrap;
   margin: -0.5rem;
@@ -103,7 +111,7 @@ export default {
 .item {
   width: 100px;
   list-style: none;
-  border: 1px solid black;
+  background-color: white;
   border-radius: 10px;
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.6);
   margin: 0.4rem;
