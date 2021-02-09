@@ -1,9 +1,8 @@
 <template>
-  <div class="header"></div>
+  <div class="header" id="the-header"></div>
+  <a type="button" class="nes-btn is-primary go-up" href="#the-header">up!</a>
   <div class="invetory">
-    <h1 class="inventory__header">
-      Has click en un pokemon para añadirlo a la lista
-    </h1>
+    <h1 class="inventory__header">¿Cuál es ese pokémon?</h1>
     <ul class="inventory__list-box">
       <li
         v-for="poke in lista"
@@ -20,18 +19,30 @@
 
     <ul class="container">
       <li
-        class="item"
+        class="item nes-container"
         v-for="(pokemon, index) in pokemones"
         :key="index"
-        @click="selectPokemon(pokemon)"
+        @click="logPoke(pokemon)"
       >
-        <button class="nes-btn is-succes btn__add">+</button>
-        <p>
+        <form
+          class="nes-field"
+          v-if="!checkList(index)"
+          @submit.prevent="checkInput(pokemon, index)"
+        >
+          <label :for="index"></label>
+          <input
+            type="text"
+            :id="index"
+            class="nes-input item__input"
+            v-model="adivinando[index]"
+          />
+        </form>
+        <p v-else>
           {{ pokemon }}
         </p>
 
         <!-- <p>{{ imagesArray[1] }}</p> -->
-        <img :src="imagesArray[index]" :alt="pokemon" class="item__img" />
+        <img :src="imagesArray[index]" :alt="pokemon" :class="image(index)" />
         <ul class="abilities">
           <li v-for="abilities in pokeAbilities[index]" :key="abilities">
             <!-- {{ abilities }} -->
@@ -48,7 +59,16 @@
       </li>
     </ul>
   </div>
-  <div class="footer">the footer</div>
+  <div class="footer">
+    <section class="icon-list">
+      <p>This is powered by</p>
+      <!-- github -->
+      <a href="https://nostalgic-css.github.io/NES.css/" target="_blank"
+        ><i class="nes-icon github is-large"></i
+      ></a>
+      <p>NES.css</p>
+    </section>
+  </div>
 </template>
 
 <script>
@@ -59,9 +79,26 @@ export default {
       imagesArray: [],
       pokeAbilities: [],
       lista: [],
+      adivinando: new Array(150).fill(""),
+      boolIndex: new Array(150).fill(false),
+      counter: 0,
     };
   },
+  computed: {},
   methods: {
+    image(index) {
+      return this.boolIndex[index] ? "item__img--show" : "item__img";
+    },
+    checkList(index) {
+      return this.boolIndex[index];
+    },
+    checkInput(pokemon, index) {
+      if (pokemon.toLowerCase() === this.adivinando[index]) {
+        this.counter++;
+        this.boolIndex[index] = true;
+        return true;
+      }
+    },
     selectPokemon(pokemon) {
       if (!this.lista.includes(pokemon)) {
         console.log("added: " + pokemon);
@@ -72,6 +109,9 @@ export default {
     },
     remove(poke) {
       this.lista = this.lista.filter((r) => r !== poke);
+    },
+    logPoke(pokemon) {
+      console.log(pokemon);
     },
   },
   created() {
@@ -122,6 +162,9 @@ export default {
 </script>
 
 <style lang="scss">
+html {
+  scroll-behavior: smooth;
+}
 #app {
   font-family: "Press Start 2P", cursive;
   font-size: 70%;
@@ -129,7 +172,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  background-color: red;
+  background-image: linear-gradient(
+      to right,
+      #0e0e0e 20%,
+      transparent 60%,
+      #0e0e0e 100%
+    ),
+    url("./assets/wallpaper.png");
 }
 .header {
   width: 100%;
@@ -148,16 +197,15 @@ export default {
   margin: 1rem;
   padding: 1rem;
 }
-.btn__add {
-  position: relative;
-  top: -1.5rem;
-
-}
+// .btn__add {
+//   position: relative;
+//   top: -1.5rem;
+// }
 .item {
   display: inline-block;
   vertical-align: top;
   width: 200px;
-  height: 300px;
+  height: 320px;
   list-style: none;
   background-color: white;
   border-radius: 10px;
@@ -165,19 +213,44 @@ export default {
   margin: 1rem 1rem;
   padding: 2rem;
   transition: all 0.6s;
-  &:hover {
-    transform: scale(1.2);
-    box-shadow: 0.2rem 1rem 3rem rgba(0, 0, 0, 0.6);
-  }
-  &:hover &__img {
+  // &:hover {
+  //   transform: scale(1.2);
+  //   box-shadow: 0.2rem 1rem 3rem rgba(0, 0, 0, 0.6);
+  // }
+  // &:hover &__img {
+  //   transform: scale(2);
+  //   filter:  drop-shadow(5px 5px 5px #000);
+  // }
+  &__img--show & {
     transform: scale(2);
-    filter:  drop-shadow(5px 5px 5px #000);
   }
   &__img {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
     width: 100px;
     padding: 1rem;
     transform: scale(2);
     filter: brightness(0%) drop-shadow(5px 5px 5px #000);
+    &--show {
+      width: 100px;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      transform: scale(2);
+      filter: brightness(100%) drop-shadow(5px 5px 5px #000);
+    }
+  }
+}
+.adivinando {
+  display: inline-block;
+  &__input {
+    float: left;
+    width: 70%;
+    margin-bottom: 2rem;
+  }
+  button {
+    float: right;
+    width: 30%;
   }
 }
 .abilities {
@@ -220,6 +293,22 @@ export default {
     &:not(&:last-child) {
       margin-right: 1rem;
     }
+  }
+}
+.footer {
+  padding: 2rem;
+  background-color: #4b50a944;
+  color: #f5d536;
+}
+.go-up {
+  position: fixed;
+  right: 4rem;
+  bottom: 4rem;
+  z-index: 100;
+  @media (max-width: 600px) {
+    width: 3rem;
+    right: 1rem;
+    bottom: 1rem;
   }
 }
 @import "../node_modules/nes.css/css/nes.css";
