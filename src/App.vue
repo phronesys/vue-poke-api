@@ -3,21 +3,11 @@
   <a type="button" class="nes-btn is-primary go-up" href="#the-header">up!</a>
   <div class="invetory">
     <h1 class="inventory__header">¿Cuál es ese pokémon?</h1>
-    <ul class="inventory__list-box">
-      <li
-        v-for="poke in lista"
-        :key="poke"
-        class="inventory__list"
-        @click="remove(poke)"
-      >
-        {{ poke }}
-      </li>
-    </ul>
+    <ul class="inventory__list-box"></ul>
   </div>
   <div class="main">
-    <!-- <div>{{images}}</div> -->
-
-    <ul class="container">
+    <h3 class="loading" v-if="isLoading">Loading...</h3>
+    <ul class="container" v-else>
       <li
         class="item nes-container"
         v-for="(pokemon, index) in pokemones"
@@ -82,6 +72,7 @@ export default {
       adivinando: new Array(150).fill(""),
       boolIndex: new Array(150).fill(false),
       counter: 0,
+      isLoading: true
     };
   },
   computed: {},
@@ -93,7 +84,10 @@ export default {
       return this.boolIndex[index];
     },
     checkInput(pokemon, index) {
-      if (pokemon.toLowerCase() === this.adivinando[index]) {
+      if (
+        pokemon.toLowerCase() === this.adivinando[index] ||
+        pokemon == this.adivinando[index]
+      ) {
         this.counter++;
         this.boolIndex[index] = true;
         return true;
@@ -156,7 +150,10 @@ export default {
         console.error(error);
       }
     };
-    pokemonsitos();
+    pokemonsitos().then(() => {
+      this.isLoading = false;
+      
+    });
   },
 };
 </script>
@@ -188,6 +185,12 @@ html {
   background-image: url("./assets/pokeapi.png");
   background-position: center;
   background-size: cover;
+  @media (max-width: 700px) {
+    background-size: 100%;
+    background-position: top;
+    background-repeat: no-repeat;
+    padding: 6rem 0;
+  }
 }
 .container {
   // display: flex;
