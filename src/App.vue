@@ -171,12 +171,13 @@ export default {
   }
   &:hover &__img {
     transform: scale(2);
-    filter: none;
+    filter:  drop-shadow(5px 5px 5px #000);
   }
   &__img {
     width: 100px;
     padding: 1rem;
-    filter: grayscale(100%) blur(1px) drop-shadow(5px 5px 5px #000);
+    transform: scale(2);
+    filter: brightness(0%) drop-shadow(5px 5px 5px #000);
   }
 }
 .abilities {
